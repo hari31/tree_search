@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+struct std {
+	int marks[6];
+	int under_19;
+    int age;
+	int route;
+	struct std *left;
+	struct std *right;
+};
+typedef struct std node;
+node* head = NULL;
+node* create() {
+	node* newnode = (node*)malloc(sizeof(node));
+	for(int i=0; i<6; i++)
+		scanf("%d", &newnode->marks[i]);
+	scanf("%d %d %d", &newnode->age, &newnode->under_19, &newnode->route);
+	newnode->left = NULL;
+	newnode->right = NULL;
+    return newnode;
+}
+node** q = (node**)malloc(sizeof(node*)*50);
+int rear = -1, front = -1;
+int route_count = 0, marks_count = 0, cricket_count = 0, count = 0;
+void bfs(int org_route) {
+	node* temp = NULL;
+	q[++rear] = head;
+	while(rear!=front) {
+		temp = q[++front];
+		q[++rear] = temp->left;
+		q[++rear] = temp->right;
+		if(temp->route == org_route)
+			route_count++;
+		count = 0;
+		for(int i=0; i<6; i++)
+			if(temp->marks[i] >=40 && temp->marks[i]<=45)
+				count++;
+		if(count == 3)
+			marks_count++;
+		if(temp->age >= 19 && temp->under_19 == 1)
+			cricket_count++;
+	}
+}
+node** queue = (node**)malloc(sizeof(node*)*50);
+int r = -1, f = -1;
+int main() {
+	node* temp = NULL;
+	int flag = 0;
+	for(int i=0; i<4; i++) {
+		if(head == NULL) {
+			head = create();
+			q[++r] = head;
+		}
+		else {
+			temp = create();
+			if(flag == 0){
+                queue[++r] = temp;
+				queue[++f]->left = temp;
+				flag = 1;
+			}
+			else {
+				queue[++r] = temp;
+				queue[f]->right = temp;
+				flag = 0;
+			}
+		}
+	}
+	int route = 0;
+	scanf("%d", &route);
+	bfs(route);
+	printf("No of students in route %d are %d\n", route, route_count );
+	printf("No of students got marks between 40 & 50 are %d\n", marks_count);
+	printf("No of students interseted in under_19 and having age greater than 19 are %d\n", cricket_count);
+    return 0;
+}
+
+
+/*
+1 2 3 40 41 42 20 1 5
+1 2 3 4 40 41 19 0 5
+1 2 3 4 5 6 18 1 6
+1 2 40 41 42 43 21 1 5
+*/
